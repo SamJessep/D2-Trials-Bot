@@ -1,5 +1,7 @@
-import interfaces.IInfoCollector;
-import interfaces.IMessageView;
+package nz.trialsBot;
+
+import nz.trialsBot.interfaces.IInfoCollector;
+import nz.trialsBot.interfaces.IMessageView;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -18,7 +20,7 @@ public class BotController {
     public void run(){
         LocalDate date = LocalDate.now();
         File image = infoCollector.getRewardsScreenshot();
-        String messageText = String.format("Trials rewards %s", date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        messageBot.sendMessage(messageText,image);
+        String messageText = String.format("Trials rewards for %s", date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        messageBot.sendMessageAll(messageText,image);
     }
 }
