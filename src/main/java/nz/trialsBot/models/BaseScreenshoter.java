@@ -17,6 +17,11 @@ public class BaseScreenshoter implements IInfoCollector {
         return null;
     }
 
+    @Override
+    public void close() {
+        _driver.quit();
+    }
+
     public File resize(File screenshot){
         try{
             BufferedImage img = Scalr.resize(ImageIO.read(screenshot), 1000);

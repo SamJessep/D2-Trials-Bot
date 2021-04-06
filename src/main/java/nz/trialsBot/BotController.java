@@ -22,5 +22,8 @@ public class BotController {
         File image = infoCollector.getRewardsScreenshot();
         String messageText = String.format("Trials rewards for %s", date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         messageBot.sendMessageAll(messageText,image);
+        try{Thread.sleep(10000);}catch (Exception e){e.printStackTrace();}
+        messageBot.close();
+        infoCollector.close();
     }
 }

@@ -8,4 +8,5 @@ public interface IInfoCollector {
      * @return returns the rewards screenshot as a File object
      */
     File getRewardsScreenshot();
+    void close();
 }

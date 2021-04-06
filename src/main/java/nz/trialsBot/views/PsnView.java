@@ -74,6 +74,11 @@ public class PsnView implements IMessageView {
         }
     }
 
+    @Override
+    public void close() {
+        _driver.quit();
+    }
+
     public int countChats(){
         return _driver.findElements(By.cssSelector(CHATS)).size();
     }

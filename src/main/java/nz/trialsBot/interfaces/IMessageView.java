@@ -28,4 +28,5 @@ public interface IMessageView {
      * @param image the image file to send
      */
     void sendMessageAll(String text, File image);
+    void close();
 }

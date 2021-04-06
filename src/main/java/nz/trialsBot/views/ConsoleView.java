@@ -25,4 +25,9 @@ public class ConsoleView implements IMessageView {
     public void sendMessageAll(String text, File image) {
 
     }
+
+    @Override
+    public void close() {
+
+    }
 }
