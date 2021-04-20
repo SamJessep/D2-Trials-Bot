@@ -8,14 +8,12 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class BaseScreenshoter implements IInfoCollector {
+public abstract class BaseScreenshoter implements IInfoCollector {
 
     protected WebDriver _driver;
 
     @Override
-    public File getRewardsScreenshot() {
-        return null;
-    }
+    public abstract File getRewardsScreenshot();
 
     @Override
     public void close() {

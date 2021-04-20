@@ -6,22 +6,27 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.io.IOException;
 
 public class PsnView implements IMessageView {
-    private static final String LOGIN_URL = "https://my.playstation.com/profile/FireteamBot/friends";
+    private static final String LOGIN_URL = "https://my.playstation.com/profile/me/friends?openChat";
     protected WebDriver _driver;
     protected WebDriverWait _wait;
 
+    private WebDriverWait LONG_WAIT;
+
     //PSN WEB ELEMENTS, CSS SELECTIONS
-    private static final String START_LOGIN_BTN = "#sb-social-toolbar-root > div > div > button";
+    private static final String START_LOGIN_BTN = "#sb-social-toolbar-root > div > div #sb-signin-link";
     private static final String EMAIL_FIELD = "input[title=\"Sign-In ID (Email Address)\"]";
     private static final String NEXT_BTN = "button.primary-button";
     private static final String PASSWORD_FIELD = "input[title=\"Password\"]";
     private static final String LOGIN_BTN = "button.primary-button";
     private static final String MESSAGES_BTN = "#sb-messages-dropdown-toggle";
+    private static final String MESSAGES_PANEL = "#sb-messages-dropdown";
     private static final String CHATS = ".sb-list>li";
     private static final String MESSAGE_INPUT = "textarea";
     private static final String FILE_INPUT_DROP = ".sb-drop-attachment__drop-zone";
@@ -34,9 +39,11 @@ public class PsnView implements IMessageView {
                 "--disable-blink-features=AutomationControlled",
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "+
                 "Chrome/87.0.4280.141 Safari/537.36",
-                "user-data-dir=D:\\Users\\Sam\\Desktop\\tmp\\D2Bot");
+                "user-data-dir=./user-data");
+        options.addArguments("window-size=1160,888");
         _driver = new ChromeDriver(options);
-        _wait = new WebDriverWait(_driver, 2);
+        _wait = new WebDriverWait(_driver, 10);
+        LONG_WAIT = new WebDriverWait(_driver, 30);
         login(email, password);
     }
 
@@ -97,13 +104,29 @@ public class PsnView implements IMessageView {
             findAndClick(PASSWORD_FIELD).sendKeys(password);
             findAndClick(LOGIN_BTN);
         }catch(Exception e){
+            //Probably already logged in
             //e.printStackTrace();
         }
-        findAndClick(MESSAGES_BTN);
+        if(!messagePanelOpen()){
+            findAndClick(MESSAGES_BTN);
+        }
+
+    }
+
+    private boolean messagePanelOpen() {
+        LONG_WAIT.until(d -> d.findElement(By.cssSelector(MESSAGES_PANEL)));
+        return _driver.findElement(By.cssSelector(MESSAGES_PANEL)).getAttribute("style").equals("display: block;");
     }
 
     private WebElement findAndClick(String cssSelector){
         _wait.until(d -> d.findElement(By.cssSelector(cssSelector)));
+        WebElement el = _driver.findElement(By.cssSelector(cssSelector));
+        el.click();
+        return el;
+    }
+
+    private WebElement findAndClick(String cssSelector, WebDriverWait wait){
+        wait.until(d -> d.findElement(By.cssSelector(cssSelector)));
         WebElement el = _driver.findElement(By.cssSelector(cssSelector));
         el.click();
         return el;

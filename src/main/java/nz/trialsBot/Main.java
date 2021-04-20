@@ -10,6 +10,12 @@ public class Main {
         String PSN_EMAIL = args[0];
         String PSN_PASSWORD = args[1];
         System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
-        new BotController(new LightGgTrials(), new PsnView(PSN_EMAIL, PSN_PASSWORD)).run();
+        try{
+            new BotController(new LightGgTrials(), new PsnView(PSN_EMAIL, PSN_PASSWORD)).run();
+        }catch (Exception e){
+            e.printStackTrace();
+            BotController.cleanupChromeProcesses();
+        }
+
     }
 }

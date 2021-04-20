@@ -4,6 +4,7 @@ import nz.trialsBot.interfaces.IInfoCollector;
 import nz.trialsBot.interfaces.IMessageView;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -25,5 +26,19 @@ public class BotController {
         try{Thread.sleep(10000);}catch (Exception e){e.printStackTrace();}
         messageBot.close();
         infoCollector.close();
+
+        cleanupChromeProcesses();
+    }
+
+    public static void cleanupChromeProcesses() {
+        String systemType = System.getProperty("os.name").toLowerCase();
+        if (systemType.contains("win")) {
+            try {
+                System.out.println("Close one or more driver exe files");
+                Runtime.getRuntime().exec("taskkill /f /im chromedriver.exe");
+            } catch (IOException e) {
+                System.out.println("Failed to close one or more driver exe files");
+            }
+        }
     }
 }
