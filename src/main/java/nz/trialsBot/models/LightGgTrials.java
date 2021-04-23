@@ -1,7 +1,8 @@
 package nz.trialsBot.models;
 
 import nz.trialsBot.views.helpers.RewardsDrawer;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
@@ -9,6 +10,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +23,6 @@ public class LightGgTrials extends BaseScreenshoter {
         return makeRewardsScreenshot();
     }
 
-    private File takeRewardsScreenshot(){
-        try{
-            ((JavascriptExecutor) _driver).executeScript("arguments[0].scrollIntoView(true);", _driver.findElement(By.cssSelector("#trials-billboard > div:nth-child(2) > div.subheader > h2 > span > a > img")));
-            Thread.sleep(500);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return resize(crop(((TakesScreenshot)_driver).getScreenshotAs(OutputType.FILE)));
-    }
     private File makeRewardsScreenshot(){
         List<String> threeWins = getRewardImages(".rewards-0 img");
         List<String> fiveWins = getRewardImages(".rewards-1 img");
@@ -41,7 +34,7 @@ public class LightGgTrials extends BaseScreenshoter {
         try {
             BufferedImage img = RewardsDrawer.drawRewards(threeWins,fiveWins,sevenWins,flawless,mapName);
             ImageIO.write(img,"jpg",outfile);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
         return outfile;
@@ -52,47 +45,6 @@ public class LightGgTrials extends BaseScreenshoter {
         List<WebElement> imgs = _driver.findElements(By.cssSelector(cssSelector));
         imgs.forEach(el->imgUrls.add(el.getAttribute("src")));
         return imgUrls;
-    }
-
-    public void getRewards() {
-        initialize();
-        String threeWins = ".rewards-0 img";
-        String fiveWins = ".rewards-1 img";
-        String sevenWins = ".rewards-2 img";
-        String flawless = ".rewards-3 img";
-        //Extract Images for section
-
-        List<WebElement> threeWinImages = _driver.findElements(By.cssSelector(threeWins));
-        threeWinImages.forEach(el->System.out.println(el.getAttribute("src")));
-    }
-
-
-    private File crop(File screenshot) {
-        WebElement ele = _driver.findElement(By.id("trials-billboard"));
-        // Get entire page screenshot
-        BufferedImage fullImg = null;
-        try{
-            fullImg = ImageIO.read(screenshot);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        // Get the location of element on the page
-        Point point = ele.getLocation();
-        // Get width and height of the element
-        int eleWidth = ele.getSize().getWidth();
-        int eleHeight = ele.getSize().getHeight();
-
-        JavascriptExecutor executor = (JavascriptExecutor) _driver;
-        int value = Math.toIntExact((Long)executor.executeScript("return window.pageYOffset;"));
-        // Crop the entire page screenshot to get only element screenshot
-        BufferedImage eleScreenshot= fullImg.getSubimage(point.getX(), point.getY()-value,
-                eleWidth, eleHeight);
-        try{
-            ImageIO.write(eleScreenshot, "png", screenshot);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return  screenshot;
     }
 
 

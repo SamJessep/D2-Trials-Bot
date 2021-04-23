@@ -1,16 +1,16 @@
 package nz.trialsBot.views;
 
 import nz.trialsBot.interfaces.IMessageView;
+import nz.trialsBot.views.helpers.RewardsDrawer;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class PsnView implements IMessageView {
     private static final String LOGIN_URL = "https://my.playstation.com/profile/me/friends?openChat";
@@ -35,11 +35,17 @@ public class PsnView implements IMessageView {
 
     public PsnView(String email, String password) {
         ChromeOptions options = new ChromeOptions();
+        String userData = "./user-data";
+        try {
+            userData = RewardsDrawer.class.getClassLoader().getResource("user-data").toURI().toString();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         options.addArguments(
                 "--disable-blink-features=AutomationControlled",
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "+
                 "Chrome/87.0.4280.141 Safari/537.36",
-                "user-data-dir=./user-data");
+                "user-data-dir="+userData);
         options.addArguments("window-size=1160,888");
         _driver = new ChromeDriver(options);
         _wait = new WebDriverWait(_driver, 10);
