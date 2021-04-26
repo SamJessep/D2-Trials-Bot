@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class PsnView implements IMessageView {
@@ -35,12 +36,7 @@ public class PsnView implements IMessageView {
 
     public PsnView(String email, String password) {
         ChromeOptions options = new ChromeOptions();
-        String userData = "./user-data";
-        try {
-            userData = RewardsDrawer.class.getClassLoader().getResource("user-data").toURI().toString();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        String userData = getUserDir();
         options.addArguments(
                 "--disable-blink-features=AutomationControlled",
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "+
@@ -51,6 +47,14 @@ public class PsnView implements IMessageView {
         _wait = new WebDriverWait(_driver, 10);
         LONG_WAIT = new WebDriverWait(_driver, 30);
         login(email, password);
+    }
+
+    private String getUserDir(){
+        try {
+            return new File("./user-data").getCanonicalPath();
+        } catch (IOException e) {
+            return "./user-data";
+        }
     }
 
     @Override
@@ -140,7 +144,7 @@ public class PsnView implements IMessageView {
 
     private static void DropFile(File filePath, WebElement target) {
         if(!filePath.exists())
-            throw new WebDriverException("File not found: " + filePath.toString());
+            throw new WebDriverException("File not found: " + filePath);
 
         WebDriver driver = ((RemoteWebElement)target).getWrappedDriver();
         JavascriptExecutor jse = (JavascriptExecutor)driver;

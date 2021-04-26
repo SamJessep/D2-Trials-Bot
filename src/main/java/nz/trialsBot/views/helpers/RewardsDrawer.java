@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class RewardsDrawer {
     private static List<BufferedImage> loadImagesFromUrls(List<String> urls) throws IOException {
@@ -80,17 +81,16 @@ public class RewardsDrawer {
     }
 
 
-    private static BufferedImage drawRewardsSection(Map<String, List<String>> rewards, int padding) throws IOException {
+    private static BufferedImage drawRewardsSection(RewardRow[] rewards, int padding) throws IOException {
         BufferedImage rewardsCanvas = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
         Graphics g = rewardsCanvas.getGraphics();
 
         int nextY = 0;
 
-        for (String rewardRowTitle : rewards.keySet()) {
-            List<BufferedImage> images = loadImagesFromUrls(rewards.get(rewardRowTitle));
-
+        for (RewardRow row : rewards) {
+            List<BufferedImage> images = loadImagesFromUrls(row.imgUrls);
             drawRow(images, g, padding, nextY + padding);
-            drawText(rewardRowTitle, getSectionWidth(images, padding) + padding, (images.get(0).getHeight() / 2) + nextY + padding, Color.white, g);
+            drawText(row.title, getSectionWidth(images, padding) + padding, (images.get(0).getHeight() / 2) + nextY + padding, Color.white, g);
             nextY = nextY + images.get(0).getHeight() + padding;
         }
         return rewardsCanvas;
@@ -99,12 +99,12 @@ public class RewardsDrawer {
     public static BufferedImage drawRewards(List<String> three, List<String> five, List<String> seven, List<String> flawless, String mapName) throws IOException, URISyntaxException {
         int padding = 8;
         //Setup & draw rewards section
-        Map<String, List<String>> rewardsMap = Map.of(
-                "3 Wins", three,
-                "5 Wins", five,
-                "7 Wins", seven,
-                "Flawless", flawless
-        );
+        RewardRow[] rewardsMap = new RewardRow[]{
+            new RewardRow("3 Wins", three),
+            new RewardRow("5 Wins", five),
+            new RewardRow("7 Wins", seven),
+            new RewardRow("Flawless", flawless)
+        };
         BufferedImage rewardsSection = trimImage(drawRewardsSection(rewardsMap, padding));
         BufferedImage backgroundCanvas = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
         //Draw rewards card background
@@ -140,13 +140,23 @@ public class RewardsDrawer {
     }
 
     public static String getBackground(String name) throws URISyntaxException {
-        URI mapdDIR = RewardsDrawer.class.getClassLoader().getResource("maps").toURI();
+        URI mapdDIR = Objects.requireNonNull(RewardsDrawer.class.getClassLoader().getResource("maps")).toURI();
         File dir = new File(mapdDIR);
         File[] files = dir.listFiles();
+        assert files != null;
         for (File file : files)
             if (file.getName().matches("(?i).*" + name + ".*")) {
                 return file.getAbsolutePath();
             }
         return "";
+    }
+    static class RewardRow{
+        public String title;
+        public List<String> imgUrls;
+
+        RewardRow(String t, List<String> i){
+            title = t;
+            imgUrls = i;
+        }
     }
 }
