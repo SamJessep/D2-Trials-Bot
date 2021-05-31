@@ -4,8 +4,7 @@ package nz.trialsBot.views.helpers;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -112,8 +111,8 @@ public class RewardsDrawer {
         //Draw rewards on card
         backgroundCanvas.getGraphics().drawImage(rewardsSection, padding * 3, padding * 3, null);
         //Load background map
-        String mapFile = getBackground(mapName);
-        rewardsSection = ImageIO.read(new File(mapFile));
+        InputStream mapFile = getBackgroundStream(mapName);
+        rewardsSection = ImageIO.read(mapFile);
         //Draw rewards on map
         rewardsSection.getGraphics().drawImage(resizeImage(trimImage(backgroundCanvas), 900, 900, BufferedImage.TYPE_INT_ARGB), 10, 10, null);
         return resizeImage(rewardsSection, 1920, 1080, BufferedImage.TYPE_INT_RGB);
@@ -139,17 +138,34 @@ public class RewardsDrawer {
         return image.getSubimage(left, top, right - left + 1, bottom - top + 1);
     }
 
-    public static String getBackground(String name) throws URISyntaxException {
-        URI mapdDIR = Objects.requireNonNull(RewardsDrawer.class.getClassLoader().getResource("maps")).toURI();
-        File dir = new File(mapdDIR);
-        File[] files = dir.listFiles();
-        assert files != null;
-        for (File file : files)
-            if (file.getName().matches("(?i).*" + name + ".*")) {
-                return file.getAbsolutePath();
+    public static InputStream getBackgroundStream(String name) throws URISyntaxException {
+        String[] maps = readMapsList();
+        String mapPath = "maps/error.png";
+        for (String map : maps)
+            if (map.matches("(?i).*" + name + ".*")) {
+                mapPath = "maps/"+map;
             }
-        return "";
+        return RewardsDrawer.class.getClassLoader().getResourceAsStream(mapPath);
     }
+
+    private static String[] readMapsList() {
+        Reader inputStreamReader = new InputStreamReader(
+                RewardsDrawer.class.getClassLoader().getResourceAsStream("maps/maps.txt"));
+        BufferedReader txtReader = new BufferedReader(inputStreamReader);
+        List<String> mapNames = new ArrayList<>();
+        String line = null;
+
+        while (true) {
+            try {
+                if ((line = txtReader.readLine()) == null) break;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mapNames.add(line);
+        }
+        return mapNames.toArray(new String[0]);
+    }
+
     static class RewardRow{
         public String title;
         public List<String> imgUrls;

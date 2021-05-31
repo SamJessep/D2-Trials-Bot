@@ -24,10 +24,11 @@ public class LightGgTrials extends BaseScreenshoter {
     }
 
     private File makeRewardsScreenshot(){
-        List<String> threeWins = getRewardImages(".rewards-0 img");
-        List<String> fiveWins = getRewardImages(".rewards-1 img");
-        List<String> sevenWins = getRewardImages(".rewards-2 img");
-        List<String> flawless = getRewardImages(".rewards-3 img");
+        _wait.until(d -> d.findElement(By.cssSelector("#trials-billboard")));
+        List<String> threeWins = getRewardImages("#trials-billboard .rewards-0 img");
+        List<String> fiveWins = getRewardImages("#trials-billboard .rewards-1 img");
+        List<String> sevenWins = getRewardImages("#trials-billboard .rewards-2 img");
+        List<String> flawless = getRewardImages("#trials-billboard .rewards-3 img");
         String mapName = _driver.findElement(By.cssSelector("#trials-billboard .map-name")).getText().trim();
         String defaultBaseDir = System.getProperty("java.io.tmpdir");
         File outfile = new File(defaultBaseDir+"out.jpg");
@@ -49,9 +50,6 @@ public class LightGgTrials extends BaseScreenshoter {
 
 
     private void initialize(){
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("window-size=550,888");
-        _driver = new ChromeDriver(options);
         _driver.get(TARGET_URL);
     }
 }

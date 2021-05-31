@@ -51,7 +51,7 @@ public class PsnView implements IMessageView {
 
     private String getUserDir(){
         try {
-            return new File("./user-data").getCanonicalPath();
+            return new File("./.user-data").getCanonicalPath();
         } catch (IOException e) {
             return "./user-data";
         }
